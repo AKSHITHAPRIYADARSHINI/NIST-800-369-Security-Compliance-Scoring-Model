@@ -1,7 +1,9 @@
 from __future__ import annotations
 import io
+import os
 import pandas as pd
 import streamlit as st
+from pathlib import Path
 from compliance_scoring_model import normalize_dataframe, build_summary, domain_scores, risk_summary
 
 st.set_page_config(page_title="NIST 800-369 Compliance Scoring Model", layout="wide")
@@ -35,23 +37,27 @@ with st.sidebar:
     st.markdown("Download the example CSV to try the scoring model:")
 
     # Read and offer the example CSV for download
+    csv_file = Path(__file__).parent / "nist_800_369_compliance_input.csv"
     try:
-        example_df = pd.read_csv("nist_800_369_compliance_input.csv")
-        csv_buffer = io.StringIO()
-        example_df.to_csv(csv_buffer, index=False)
+        if csv_file.exists():
+            example_df = pd.read_csv(csv_file)
+            csv_buffer = io.StringIO()
+            example_df.to_csv(csv_buffer, index=False)
 
-        st.download_button(
-            label="⬇️ Download Example CSV",
-            data=csv_buffer.getvalue(),
-            file_name="nist_800_369_compliance_input.csv",
-            mime="text/csv",
-            key="download_example"
-        )
+            st.download_button(
+                label="⬇️ Download Example CSV",
+                data=csv_buffer.getvalue(),
+                file_name="nist_800_369_compliance_input.csv",
+                mime="text/csv",
+                key="download_example"
+            )
 
-        st.markdown("**Preview of example file:**")
-        st.dataframe(example_df.head(5), use_container_width=True)
-    except FileNotFoundError:
-        st.warning("Example file not found")
+            st.markdown("**Preview of example file:**")
+            st.dataframe(example_df.head(5), use_container_width=True)
+        else:
+            st.warning("Example file not found in app directory")
+    except Exception as e:
+        st.warning(f"Could not load example file: {e}")
 
 uploaded = st.file_uploader("Upload your compliance CSV", type=["csv"])
 

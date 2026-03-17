@@ -1,0 +1,9 @@
+domain,nist_800_369_control,control_requirement,weight,implementation_status
+Access Control,NIST 800-369.AC.1,Implement multi-factor authentication,5,Implemented
+Access Control,NIST 800-369.AC.2,Student password policy enforcement,4,Partial
+Data Protection,NIST 800-369.DP.1,Encryption of student data at rest,5,Implemented
+Data Protection,NIST 800-369.DP.2,Data loss prevention tools,4,Not Implemented
+Incident Response,NIST 800-369.IR.1,Incident response plan,3,Implemented
+Incident Response,NIST 800-369.IR.2,Incident reporting procedures,3,Partial
+Network Security,NIST 800-369.NS.1,Firewall configuration,5,Implemented
+Network Security,NIST 800-369.NS.2,Intrusion detection system,4,Partial
