@@ -1,0 +1,39 @@
+domain,nist_800_369_control,nist_800_171_control,nist_800_53_control,control_requirement,weight,implementation_status,tailored_for_school_environment,control_owner,review_notes,status_score,weighted_points,risk_level
+Secure Software Development Lifecycle (SDLC),NIST 800-369.V.1,3.16 System & Services Acquisition,SA – System & Services Acquisition,"Secure design principles, secure coding standards",3,Implemented,Yes,IT Security,,1.0,3.0,Low
+Secure Software Development Lifecycle (SDLC),NIST 800-369.V.1,3.16.01 Security Engineering Principles,SA-3 System Development Life Cycle,Integrate security into development lifecycle,3,Implemented,No,Compliance,,1.0,3.0,Low
+Secure Software Development Lifecycle (SDLC),NIST 800-369.V.1,,SA-8 Security Engineering Principles,Secure architecture and design review,3,Partial,Yes,IT Operations,,0.5,1.5,Low
+Secure Software Development Lifecycle (SDLC),NIST 800-369.V.1,,SA-11 Developer Security Testing,Static and dynamic code analysis,3,Not Implemented,No,Vendor Management,,0.0,0.0,Medium
+Secure Software Development Lifecycle (SDLC),NIST 800-369.V.1,,SA-15 Development Process Standards,Secure coding practices,3,Implemented,Yes,School Admin,,1.0,3.0,Low
+Secure Software Development Lifecycle (SDLC),NIST 800-369.V.1,,SA-22 Unsupported System Components,Maintain supported secure components,3,Partial,Yes,IT Security,,0.5,1.5,Low
+Data Classification & Protection,NIST 800-369.W.1,3.8 Media Protection,MP – Media Protection,Classification of educational data,5,Implemented,Yes,Compliance,,1.0,5.0,Low
+Data Classification & Protection,NIST 800-369.W.1,3.8.01 Media Storage,MP-2 Media Access,Protect stored data,5,Implemented,No,IT Operations,,1.0,5.0,Low
+Data Classification & Protection,NIST 800-369.W.1,3.8.02 Media Access,MP-5 Media Transport,Control data access,5,Partial,Yes,Vendor Management,,0.5,2.5,Medium
+Data Classification & Protection,NIST 800-369.W.1,,IA / AC Controls,Restrict access to classified data,5,Not Implemented,No,School Admin,,0.0,0.0,High
+Data Classification & Protection,NIST 800-369.W.1,,PL-8 Information Security Architecture,Define classification policies,5,Implemented,Yes,IT Security,,1.0,5.0,Low
+Data Classification & Protection,NIST 800-369.W.1,,SC-28 Protection of Information at Rest,Encryption of sensitive data,5,Partial,Yes,Compliance,,0.5,2.5,Medium
+Third-Party Security & Vendor Management,NIST 800-369.X.1,3.16 System & Services Acquisition,SA – System & Services Acquisition,Vendor security assessments,3,Implemented,Yes,IT Operations,,1.0,3.0,Low
+Third-Party Security & Vendor Management,NIST 800-369.X.1,3.16.03 External System Services,SA-9 External System Services,Secure external services,3,Implemented,No,Vendor Management,,1.0,3.0,Low
+Third-Party Security & Vendor Management,NIST 800-369.X.1,,SR – Supply Chain Risk Management,Supply chain security,3,Partial,Yes,School Admin,,0.5,1.5,Low
+Third-Party Security & Vendor Management,NIST 800-369.X.1,,SR-3 Supply Chain Controls,Vendor risk monitoring,3,Not Implemented,No,IT Security,,0.0,0.0,Medium
+Third-Party Security & Vendor Management,NIST 800-369.X.1,,SR-5 Acquisition Strategies,Security requirements in contracts,3,Implemented,Yes,Compliance,,1.0,3.0,Low
+Student Data Privacy & FERPA Compliance,NIST 800-369.Y.1,3.8 Media Protection,MP – Media Protection,Protect student educational records,3,Partial,Yes,IT Operations,,0.5,1.5,Low
+Student Data Privacy & FERPA Compliance,NIST 800-369.Y.1,3.1 Access Control,AC-3 Access Enforcement,Restrict access to student data,3,Implemented,Yes,Vendor Management,,1.0,3.0,Low
+Student Data Privacy & FERPA Compliance,NIST 800-369.Y.1,,PL-8 Information Security Architecture,Data governance policies for education records,3,Implemented,No,School Admin,,1.0,3.0,Low
+Student Data Privacy & FERPA Compliance,NIST 800-369.Y.1,,IA – Identification & Authentication,Authentication required for access to student systems,3,Partial,Yes,IT Security,,0.5,1.5,Low
+Student Data Privacy & FERPA Compliance,NIST 800-369.Y.1,,SC-28 Protection of Information at Rest,Encrypt student data at rest,3,Not Implemented,No,Compliance,,0.0,0.0,Medium
+Student Data Privacy & FERPA Compliance,NIST 800-369.Y.1,,SC-13 Cryptographic Protection,Encrypt student data in transit,3,Implemented,Yes,IT Operations,,1.0,3.0,Low
+Classroom Device & Endpoint Security,NIST 800-369.Z.1,3.4 Configuration Management,CM – Configuration Management,Secure configuration of school devices,3,Partial,Yes,Vendor Management,,0.5,1.5,Low
+Classroom Device & Endpoint Security,NIST 800-369.Z.1,3.1 Access Control,AC-19 Access Control for Mobile Devices,Manage student mobile device access,3,Implemented,Yes,School Admin,,1.0,3.0,Low
+Classroom Device & Endpoint Security,NIST 800-369.Z.1,3.14 System & Information Integrity,SI-3 Malicious Code Protection,Endpoint malware protection,3,Implemented,No,IT Security,,1.0,3.0,Low
+Classroom Device & Endpoint Security,NIST 800-369.Z.1,,"SI-7 Software, Firmware, and Information Integrity",Protect system integrity,3,Partial,Yes,Compliance,,0.5,1.5,Low
+Classroom Device & Endpoint Security,NIST 800-369.Z.1,,CM-8 System Component Inventory,Inventory of school devices,3,Not Implemented,No,IT Operations,,0.0,0.0,Medium
+Educational Technology Platform Security,NIST 800-369.AA.1,3.16 System & Services Acquisition,SA – System & Services Acquisition,Security evaluation of EdTech platforms,3,Implemented,Yes,Vendor Management,,1.0,3.0,Low
+Educational Technology Platform Security,NIST 800-369.AA.1,3.16.03 External System Services,SA-9 External System Services,Manage LMS and external services,3,Partial,Yes,School Admin,,0.5,1.5,Low
+Educational Technology Platform Security,NIST 800-369.AA.1,,SR – Supply Chain Risk Management,Assess vendor risk,3,Implemented,Yes,IT Security,,1.0,3.0,Low
+Educational Technology Platform Security,NIST 800-369.AA.1,,AC-20 Use of External Systems,Control integration of learning platforms,3,Implemented,No,Compliance,,1.0,3.0,Low
+Educational Technology Platform Security,NIST 800-369.AA.1,,SI-4 System Monitoring,Monitor activity on educational platforms,3,Partial,Yes,IT Operations,,0.5,1.5,Low
+Security Monitoring & Dashboard Reporting,NIST 800-369.AB.1,3.12 Security Assessment and Monitoring,CA – Continuous Monitoring,Real-time monitoring of security posture,4,Not Implemented,No,Vendor Management,,0.0,0.0,High
+Security Monitoring & Dashboard Reporting,NIST 800-369.AB.1,3.3 Audit and Accountability,"AU-6 Audit Review, Analysis, and Reporting",Log monitoring and analysis,4,Implemented,Yes,School Admin,,1.0,4.0,Low
+Security Monitoring & Dashboard Reporting,NIST 800-369.AB.1,,SI-4 System Monitoring,Continuous threat detection,4,Partial,Yes,IT Security,,0.5,2.0,Medium
+Security Monitoring & Dashboard Reporting,NIST 800-369.AB.1,,IR-5 Incident Monitoring,Track security incidents,4,Implemented,Yes,Compliance,,1.0,4.0,Low
+Security Monitoring & Dashboard Reporting,NIST 800-369.AB.1,,PM-6 Metrics and Monitoring,Cybersecurity performance metrics,4,Implemented,No,IT Operations,,1.0,4.0,Low
