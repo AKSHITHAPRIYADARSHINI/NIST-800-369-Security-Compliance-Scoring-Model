@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NIST 800-369 Compliance Scoring Model</title>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <style>
+      :root {
+        --bg: #f7fafc;
+        --panel: #ffffff;
+        --text: #132033;
+        --muted: #5b6b7f;
+        --accent: #0a66c2;
+        --accent-2: #094f94;
+        --border: #dce5ef;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+        background: linear-gradient(140deg, #f8fbff, #eef5ff 45%, #f7fafc 100%);
+        color: var(--text);
+      }
+      .container {
+        max-width: 1100px;
+        margin: 24px auto;
+        padding: 0 16px 40px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      h1 { margin: 0 0 6px; font-size: 28px; }
+      .muted { color: var(--muted); }
+      .controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      button, .btn {
+        background: var(--accent);
+        color: #fff;
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button:hover, .btn:hover { background: var(--accent-2); }
+      input[type="file"] { max-width: 100%; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(120px, 1fr));
+        gap: 10px;
+      }
+      .metric {
+        background: #f3f8ff;
+        border: 1px solid #d4e4fb;
+        border-radius: 12px;
+        padding: 12px;
+      }
+      .metric .label { color: var(--muted); font-size: 12px; }
+      .metric .value { font-size: 24px; font-weight: 700; margin-top: 5px; }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th, td {
+        border-bottom: 1px solid var(--border);
+        padding: 8px;
+        text-align: left;
+      }
+      th { background: #f7fbff; }
+      .row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; }
+      .tag { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+      .High { background: #ffe3e3; color: #a00; }
+      .Medium { background: #fff0d6; color: #8a5900; }
+      .Low { background: #e7f7eb; color: #126d2d; }
+      #error { color: #b00020; font-weight: 600; }
+      @media (max-width: 900px) {
+        .grid { grid-template-columns: 1fr 1fr; }
+        .row { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="panel">
+        <h1>NIST 800-369 Compliance Scoring Model</h1>
+        <p class="muted">No Streamlit backend. This runs fully in-browser on Firebase Hosting.</p>
+        <p class="muted"><strong>Scoring formula:</strong> Overall Score (%) = (sum(weight * status_score) / sum(weight)) * 100</p>
+        <p class="muted"><strong>Status mapping:</strong> Implemented = 1.0, Partial = 0.5, Not Implemented = 0.0</p>
+        <div class="controls">
+          <input id="csvFile" type="file" accept=".csv" />
+          <button id="loadSample">Load Sample CSV</button>
+          <button id="downloadScored" disabled>Download Scored CSV</button>
+          <select id="domainFilter" disabled>
+            <option value="All">All domains</option>
+          </select>
+        </div>
+        <p id="error"></p>
+      </div>
+
+      <div class="panel">
+        <div class="grid" id="metrics"></div>
+      </div>
+
+      <div class="row">
+        <div class="panel">
+          <h3>Domain Summary</h3>
+          <div id="domainSummary"></div>
+        </div>
+        <div class="panel">
+          <h3>Risk Distribution</h3>
+          <div id="riskSummary"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Scored Controls</h3>
+        <div id="scoredControls"></div>
+      </div>
+    </div>
+
+    <script>
+      const STATUS_MAP = { Implemented: 1.0, Partial: 0.5, "Not Implemented": 0.0 };
+      const REQUIRED = ["domain", "nist_800_369_control", "control_requirement", "weight", "implementation_status"];
+      let scoredData = [];
+
+      const els = {
+        file: document.getElementById("csvFile"),
+        sample: document.getElementById("loadSample"),
+        download: document.getElementById("downloadScored"),
+        error: document.getElementById("error"),
+        metrics: document.getElementById("metrics"),
+        domainSummary: document.getElementById("domainSummary"),
+        riskSummary: document.getElementById("riskSummary"),
+        scoredControls: document.getElementById("scoredControls"),
+        domainFilter: document.getElementById("domainFilter")
+      };
+
+      function deriveRisk(status, weight) {
+        if (status === "Not Implemented" && weight >= 4) return "High";
+        if (status === "Not Implemented") return "Medium";
+        if (status === "Partial" && weight >= 4) return "Medium";
+        return "Low";
+      }
+
+      function parseCsvText(text) {
+        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+        if (parsed.errors.length) throw new Error(parsed.errors[0].message);
+        const cols = parsed.meta.fields || [];
+        const missing = REQUIRED.filter(c => !cols.includes(c));
+        if (missing.length) throw new Error(`Missing required column(s): ${missing.join(", ")}`);
+        return parsed.data;
+      }
+
+      function normalize(rows) {
+        return rows.map((row) => {
+          const weight = Number.parseFloat(row.weight);
+          const cleanWeight = Number.isFinite(weight) ? weight : 1.0;
+          const status = String(row.implementation_status || "").trim();
+          const statusScore = Object.prototype.hasOwnProperty.call(STATUS_MAP, status) ? STATUS_MAP[status] : 0.0;
+          const weightedPoints = cleanWeight * statusScore;
+          return {
+            ...row,
+            weight: cleanWeight,
+            implementation_status: status,
+            status_score: statusScore,
+            weighted_points: Number(weightedPoints.toFixed(4)),
+            risk_level: deriveRisk(status, cleanWeight)
+          };
+        });
+      }
+
+      function renderMetrics(rows) {
+        const totalWeight = rows.reduce((s, r) => s + r.weight, 0);
+        const points = rows.reduce((s, r) => s + r.weighted_points, 0);
+        const overall = totalWeight ? ((points / totalWeight) * 100).toFixed(2) : "0.00";
+        const partial = rows.filter(r => r.implementation_status === "Partial").length;
+        const notImpl = rows.filter(r => r.implementation_status === "Not Implemented").length;
+        const high = rows.filter(r => r.risk_level === "High").length;
+        const cards = [
+          ["Overall Compliance Score", `${overall}%`],
+          ["Total Controls", String(rows.length)],
+          ["High Risk Controls", String(high)],
+          ["Pending / Partial", String(partial + notImpl)]
+        ];
+        els.metrics.innerHTML = cards.map(([label, value]) => `<div class="metric"><div class="label">${label}</div><div class="value">${value}</div></div>`).join("");
+      }
+
+      function renderDomainSummary(rows) {
+        const byDomain = new Map();
+        for (const r of rows) {
+          const d = r.domain || "Unknown";
+          if (!byDomain.has(d)) byDomain.set(d, { total_weight: 0, points: 0 });
+          const item = byDomain.get(d);
+          item.total_weight += r.weight;
+          item.points += r.weighted_points;
+        }
+        const data = [...byDomain.entries()].map(([domain, v]) => ({
+          domain,
+          total_weight: v.total_weight,
+          points: v.points,
+          compliance_score_pct: v.total_weight ? ((v.points / v.total_weight) * 100) : 0
+        })).sort((a, b) => b.compliance_score_pct - a.compliance_score_pct || a.domain.localeCompare(b.domain));
+
+        els.domainSummary.innerHTML = tableHtml([
+          "Domain", "Total Weight", "Weighted Points", "Compliance Score (%)"
+        ], data.map(d => [
+          d.domain,
+          d.total_weight.toFixed(2),
+          d.points.toFixed(2),
+          d.compliance_score_pct.toFixed(2)
+        ]));
+
+        const domains = ["All", ...data.map(d => d.domain)];
+        els.domainFilter.innerHTML = domains.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
+        els.domainFilter.disabled = false;
+      }
+
+      function renderRiskSummary(rows) {
+        const counts = { High: 0, Medium: 0, Low: 0 };
+        rows.forEach(r => { counts[r.risk_level] = (counts[r.risk_level] || 0) + 1; });
+        const order = ["High", "Medium", "Low"];
+        els.riskSummary.innerHTML = tableHtml(["Risk Level", "Control Count"], order.map(r => [
+          `<span class="tag ${r}">${r}</span>`,
+          String(counts[r] || 0)
+        ]));
+      }
+
+      function renderControls(rows) {
+        const filter = els.domainFilter.value || "All";
+        const shown = filter === "All" ? rows : rows.filter(r => (r.domain || "Unknown") === filter);
+        const headers = ["domain", "nist_800_369_control", "control_requirement", "weight", "implementation_status", "status_score", "weighted_points", "risk_level"];
+        els.scoredControls.innerHTML = tableHtml(headers, shown.map(r => headers.map(h => escapeHtml(String(r[h] ?? "")))));
+      }
+
+      function tableHtml(headers, rows) {
+        return `<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+      }
+
+      function escapeHtml(value) {
+        return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+      }
+
+      function toScoredCsv(rows) {
+        return Papa.unparse(rows);
+      }
+
+      function processRows(rows) {
+        scoredData = normalize(rows);
+        renderMetrics(scoredData);
+        renderDomainSummary(scoredData);
+        renderRiskSummary(scoredData);
+        renderControls(scoredData);
+        els.download.disabled = false;
+        els.error.textContent = "";
+      }
+
+      els.file.addEventListener("change", async (e) => {
+        try {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const text = await file.text();
+          processRows(parseCsvText(text));
+        } catch (err) {
+          els.error.textContent = `Error: ${err.message || err}`;
+        }
+      });
+
+      els.sample.addEventListener("click", async () => {
+        try {
+          const res = await fetch("./sample.csv");
+          if (!res.ok) throw new Error("Could not load sample.csv");
+          const text = await res.text();
+          processRows(parseCsvText(text));
+        } catch (err) {
+          els.error.textContent = `Error: ${err.message || err}`;
+        }
+      });
+
+      els.download.addEventListener("click", () => {
+        const csv = toScoredCsv(scoredData);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "nist_800_369_scored_output.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      els.domainFilter.addEventListener("change", () => renderControls(scoredData));
+    </script>
+  </body>
+</html>

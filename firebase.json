@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "security-compliance-scorer",
+    "public": "firebase-public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

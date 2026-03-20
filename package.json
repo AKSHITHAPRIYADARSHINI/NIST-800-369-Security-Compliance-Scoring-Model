@@ -1,0 +1,9 @@
+{
+  "name": "nist-800-369-security-compliance-scoring-model",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo \"Firebase hosting build step complete\"",
+    "deploy": "firebase deploy --project security-compliance-scorer --only hosting"
+  }
+}

@@ -1,0 +1,8 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+.streamlit
+firebase-public
+node_modules
+npm-debug.log
